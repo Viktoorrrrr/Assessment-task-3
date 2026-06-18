@@ -1,0 +1,5 @@
+name: vc
+health: 100
+position: 0,0
+attack: 10
+healthpotion: 1
