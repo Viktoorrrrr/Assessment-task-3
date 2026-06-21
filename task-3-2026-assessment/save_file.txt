@@ -1,0 +1,10 @@
+name: Tester
+health: 86
+position: [1, 0]
+attack: 45
+healthpotion: 6
+inventory: ['Paladin sword']
+max_health: 100
+karma: 5
+clear: False
+map_layout: [['empty', 'empty', 'monster', 'trap', 'empty'], ['empty', 'empty', 'empty', 'monster', 'NPC'], ['trap', 'monster', 'chest', 'NPC', 'monster'], ['monster', 'empty', 'monster', 'chest', 'monster'], ['chest', 'empty', 'trap', 'chest', 'BOSS']]

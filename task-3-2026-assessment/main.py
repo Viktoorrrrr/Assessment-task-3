@@ -1,7 +1,6 @@
 import time
 import sys
 import random
-import ast
 from pathlib import Path # ai
 SAVE_FILE = Path(__file__).parent / 'save_file.txt' # ai
 def introduction():
@@ -13,12 +12,12 @@ def introduction():
     name = input('').strip()
     while name == "" or name.isspace():
         name = input('Please enter a valid name: ')
-    for line in story_dialogue:
+    for line in story_dialogue: # loop through list containing story stuff and display it
         terminal(line)
         p_input = input(f'Enter a key to continue...(or type "skip" to skip): ').strip()
-        if p_input.lower() == "skip":
+        if p_input.lower() == "skip": #break said loop if user wants to skip
             break
-    d = f'Welcome, {name}! Your adventure begins now...'
+    d = f'Welcome, {name}! Your adventure begins now...' #dummy variable bcos using f string in terminal dont work and idk how to do otherwise
     terminal(d)
     player = {'name': name,'health': 100, 'position': [0, 0], 'attack': 20, 'healthpotion': 5, 'inventory': [], 'max_health': 100, 'karma': 0, 'clear': False, 'map_layout': None}
     player['map_layout'] = [
@@ -26,8 +25,8 @@ def introduction():
         ['chest', 'NPC', 'empty', 'monster', 'NPC'], 
         ['trap', 'monster', 'chest', 'NPC', 'monster'], 
         ['monster', 'empty', 'monster', 'chest', 'monster'],
-        ['chest', 'empty', 'trap', 'chest', 'BOSS']]
-    with open(SAVE_FILE, 'w') as save_file:
+        ['chest', 'empty', 'trap', 'chest', 'BOSS']] #map of the game
+    with open(SAVE_FILE, 'w') as save_file: #write each variable in above player dict to a file in each line
         for i in player:
             save_file.write(f'{i}: {player[i]}\n')
     return player
@@ -39,13 +38,13 @@ def terminal(text, speed=0.05): # function was entirely AI
     print() # Prints a newline at the end
 def menu(player):
     print('MENU')
-    print('Type I for inventory access')
+    print('Type I for inventory access') #options
     print('Type H to use a health potion')
     print('Type P to view player stats')
     print('Type S to save game')     
     print('Type E to exit game (please save first!!)')       
     valid = False
-    while not valid:
+    while not valid: #loop as long as player inputs wrong input
         p_input = input('Type the correspondent key: ').upper()
         if p_input == 'I':
             check_inventory(player)
@@ -56,7 +55,7 @@ def menu(player):
                 player['healthpotion'] -= 1
                 player['health'] += 30
                 if player['health'] > player['max_health']:
-                    player['health'] = player['max_health']
+                    player['health'] = player['max_health'] #clamp health values that go pass max hp dont want overflow
             else:
                 terminal('You are out of health potions')
             valid = True
@@ -81,7 +80,7 @@ def check_inventory(player):
     print(f'INVENTORY: {player['inventory']}')
     valid = False
     while not valid:
-        if len(player['inventory']) != 0:
+        if len(player['inventory']) != 0: #empty inventory cant dispose anything can you??
             p_input = input('Would you like to dipose of any items? (Y/N)').lower()
             if p_input =='y' or p_input =='yes':
                 x = 1
@@ -98,13 +97,13 @@ def check_inventory(player):
                                 player['attack'] -= 5
 
                             elif player['inventory'][d_input - 1] == 'Cursed blade':
-                                player['attack'] -= 15
+                                player['attack'] -= 15 #all these is to reset player stats when removing items
                                 player['max_health'] += 10
                                 player['karma'] += 5
                             elif player['inventory'][d_input - 1] == 'Paladin sword':
                                 player['attack'] -= 25
 
-                            elif player['inventory'][d_input - 1] == 'Giants armour':
+                            elif player['inventory'][d_input - 1] == 'giants armour':
                                 player['max_health'] -= 30
                                 if player['health'] > player['max_health']:
                                     player['health'] = player['max_health']
@@ -156,7 +155,7 @@ def Movement_option(player):
             if m_input == 1 and p_position[0] > 0:
                 p_position[0] -= 1
                 valid = True
-            elif m_input == 2 and p_position[0] < 4:
+            elif m_input == 2 and p_position[0] < 4: # and conditions to prevent indexing outside of list
                 p_position[0] += 1
                 valid = True
             elif m_input == 3 and p_position[1] < 4:
@@ -175,7 +174,7 @@ def Movement_option(player):
     player['position'] = p_position
 def event_active(tile):
     if tile == 'monster' or tile == 'trap' or tile =='NPC' or tile == 'chest' or tile == 'BOSS':
-        return True
+        return True #does an event get triggered?
     else:
         return False
 def event(player, tile):
@@ -192,14 +191,14 @@ def event(player, tile):
         if player['health'] < 0:
             player['health'] = 0
     elif tile == 'BOSS':
-        player['clear'] = not player['clear']
+        player['clear'] = not player['clear'] #set clear condition to true so combat() knows to run boss fight
         combat(player)
     player['map_layout'][player['position'][0]][player['position'][1]] = 'empty' #reset the tile so its blank
     return terminal('The event has passed')
 
-def NPC(player):
+def NPC(player): 
     encounters = ['Priest', 'Priest', 'Beggar', 'Beggar', 'Beggar', 'Cultist', 'Cultist','Legion commander']
-    encounter = encounters[random.randint(0, 7)]
+    encounter = encounters[random.randint(0, 7)] #copies cause i want these to have higher chances
     if encounter == 'Priest':
         priest_event(player)
     elif encounter == 'Beggar':
@@ -330,7 +329,7 @@ def chest(player):
     items = ['Iron sword', 'Iron sword', 'Iron sword', 'Iron sword', 'Cursed blade', 'Paladin sword', 
              'health potion', 'health potion', 'health potion', 'health potion', 'giants armour', 'dryads cloak',
              ]
-    RNG_item = items[random.randint(0, 11)]
+    RNG_item = items[random.randint(0, 11)] #pick a random item
     term = f'You have received a {RNG_item}!'
     terminal(term)
     duplicate = False
@@ -340,7 +339,7 @@ def chest(player):
             tally += 1
     if tally >= 1:
         duplicate = True
-    if duplicate is False:
+    if duplicate is False: #only give item if player doesnt have one already
         if RNG_item =='Iron sword':
             terminal('This item improves your attack by 5')
             player['attack'] += 5
@@ -357,7 +356,7 @@ def chest(player):
         elif RNG_item == 'health potion':
             terminal('This item improves health by 30 when used in combat ')
             player['healthpotion'] += 1
-        elif RNG_item == 'Giants armour':
+        elif RNG_item == 'giants armour':
             terminal('This item improves health by 20, permamently')
             player['max_health'] += 30
         elif RNG_item == 'dryads cloak':
@@ -372,14 +371,15 @@ def chest(player):
 
 def debug_inventory(player):
     inventory_dict = {}
-    for i in player['inventory']:
+    for i in player['inventory']: #iterate through players inventory
+        #inventory dict just serves as a tally for each item a player owns
         inventory_dict[i] = 0
     for i in player['inventory']:
         if i in player['inventory']:
             inventory_dict[i] += 1
     for i in player['inventory']:
         if inventory_dict[i] > 1:
-            player['inventory'].remove(i)
+            player['inventory'].remove(i) #remove said items if more than 1 exists
             
 
 
@@ -441,7 +441,7 @@ def combat(player):
             if combat_option == 1:
                 monster['health'] -= round(player['attack'] * damage_bonus)
                 print(f'{player['name']} has dealt {round(player['attack'] * damage_bonus, 2)} to {encounter}')
-                time.sleep(1.5) # AI
+                time.sleep(1.5)
                 print(f'{encounter} fights back and has dealt {round(monster['damage'], 2)} damage to {player['name']}')
                 player['health'] -= round(monster['damage'], 2)
             elif combat_option == 2:
@@ -460,11 +460,10 @@ def combat(player):
         if player['health'] <= 0:
             a = f'Game over {player['name']}, You have died to the {encounter}'
             terminal(a)
-            #delete_save()
             sys.exit()
         elif monster['health'] <= 0 and player['health'] > 0:
             terminal('The dragon has been slain')
-            terminal('You open the large stone doors and witness the outside world')
+            terminal('You open the large stone doors and witness the outside world') #end game credits, change ending based on karma
             if player['karma'] >= 15:
                 terminal('Rich landscapes and bustling cities can be seen in the distance')
                 terminal('You walk through the forest, lush greenery and animals are seen everywhere')
@@ -549,7 +548,7 @@ def combat(player):
             if combat_option == 1:
                 monster['health'] -= player['attack'] * damage_bonus
                 print(f'{player['name']} has dealt {player['attack'] * damage_bonus} to {encounter}')
-                time.sleep(1.5) # AI
+                time.sleep(1.5)
                 print(f'{encounter} fights back and has dealt {monster['damage']} damage to {player['name']}')
                 player['health'] -= monster['damage']
                 if player['health'] < 0:
@@ -586,7 +585,7 @@ def combat(player):
                 terminal('The opponent has dropped something!!')
                 terminal('rolling..........')
                 chest(player)
-    elif player['attack'] >= 35:
+    elif player['attack'] >= 35: #If player has high enough attack initiate hard enemies
         h_enemies = ['Wyvern', 'Centaur', 'Hydra', 'Phoenix']
         encounter = h_enemies[random.randint(0, 3)]
         if encounter == 'Wyvern':
@@ -697,11 +696,11 @@ def game(player):
             print(f'You have encountered a {current_tile}!')
             event(player, current_tile)
     if player['health'] <= 0:
-        print('You have died, head back to menu and load game again to continue')
-def no_save():########
+        print('You have died, head back to menu and load game again to continue') 
+def no_save():#checks if a save doesnt exists
     try:
         with open(SAVE_FILE, "r") as file:
-            content = file.read() #ai but this is just to see if an error occurs when reading it
+            content = file.read() #check if an error occurs when reading it
             print("save file opened successfully.")
             return False
     except:
@@ -720,7 +719,7 @@ def load_save():
                 clean = line.strip()
                 splitted = clean.split(':')
                 value = splitted[1].strip()
-                if tally == 1:
+                if tally == 1: #go line by line and independantly assign laoded values into player
                     player['name'] = value
                 elif tally == 2:
                     try:
@@ -750,7 +749,7 @@ def load_save():
                     remove_brack = value.strip("[]'").replace("'", "") #ai
                     remove_comma = remove_brack.split(', ')
                     inventory = []
-                    if len(remove_comma) > 1:
+                    if len(remove_comma) >= 1:
                         for item in remove_comma:
                             inventory.append(item)
                     else:
@@ -781,7 +780,7 @@ def load_save():
                         list.append(cleaned.strip())
                     for rows in list:
                         row = rows.split(", ")
-                        #print(row)
+                        #print(row) ps this was testing
                         clean_map.append(row)
                     player['map_layout'] = clean_map
 
@@ -791,7 +790,7 @@ def load_save():
 def save(player):
     with open(SAVE_FILE, 'w') as save_file:
         for i in player:
-            save_file.write(f'{i}: {player[i]}\n')
+            save_file.write(f'{i}: {player[i]}\n') #once player saves overwrite the file with new values
 def main_menu():    
     valid = False
     while not valid:
