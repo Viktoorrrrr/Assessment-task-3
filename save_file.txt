@@ -1,5 +1,10 @@
-name: vc
-health: 100
-position: 0,0
-attack: 10
-healthpotion: 1
+name: vvv
+health: 83
+position: [3, 1]
+attack: 20
+healthpotion: 8
+inventory: []
+max_health: 100
+karma: 0
+clear: False
+map_layout: [['empty', 'empty', 'empty', 'trap', 'empty'], ['chest', 'NPC', 'empty', 'monster', 'NPC'], ['trap', 'monster', 'empty', 'NPC', 'monster'], ['monster', 'empty', 'empty', 'chest', 'monster'], ['chest', 'empty', 'empty', 'chest', 'BOSS']]

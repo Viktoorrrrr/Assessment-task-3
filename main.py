@@ -1,6 +1,9 @@
 import time
 import sys
 import random
+import ast
+from pathlib import Path # ai
+SAVE_FILE = Path(__file__).parent / 'save_file.txt' # ai
 def introduction():
     story_dialogue = ['You wake up, the only thing surrounding you is the dark dim lights of torches that faintly illuminate the room.', 
                       'Your body gradually rises as the stone cold for that was pressing against on your face feels a gradual alleviation of pressure.', 
@@ -10,18 +13,24 @@ def introduction():
     name = input('').strip()
     while name == "" or name.isspace():
         name = input('Please enter a valid name: ')
-    #for line in story_dialogue:
-        #terminal(line)
-        #p_input = input(f'Enter a key to continue...(or type "skip" to skip): ').strip()
-        #if p_input.lower() == "skip":
-            #break
+    for line in story_dialogue:
+        terminal(line)
+        p_input = input(f'Enter a key to continue...(or type "skip" to skip): ').strip()
+        if p_input.lower() == "skip":
+            break
     d = f'Welcome, {name}! Your adventure begins now...'
     terminal(d)
-    with open('save_file.txt', 'w') as save_file: #needs fixing
-        save_file.write(f'name: {name}' + '\nhealth: 100' + '\nposition: 0,0' + '\nattack: 10' + '\nhealthpotion: 1')
-        player = {'name': name,'health': 100, 'position': [0, 0], 'attack': 100, 'healthpotion': 5, 'inventory': [], 'max_health': 100, 'karma': 0, 'clear': False}
+    player = {'name': name,'health': 100, 'position': [0, 0], 'attack': 20, 'healthpotion': 5, 'inventory': [], 'max_health': 100, 'karma': 0, 'clear': False, 'map_layout': None}
+    player['map_layout'] = [
+        ['empty', 'chest', 'monster', 'trap', 'empty'], 
+        ['chest', 'NPC', 'empty', 'monster', 'NPC'], 
+        ['trap', 'monster', 'chest', 'NPC', 'monster'], 
+        ['monster', 'empty', 'monster', 'chest', 'monster'],
+        ['chest', 'empty', 'trap', 'chest', 'BOSS']]
+    with open(SAVE_FILE, 'w') as save_file:
+        for i in player:
+            save_file.write(f'{i}: {player[i]}\n')
     return player
-
 def terminal(text, speed=0.05): # function was entirely AI
     for char in text:
         sys.stdout.write(char)
@@ -56,22 +65,18 @@ def menu(player):
             time.sleep(1)
             valid = True 
         elif p_input == 'S':
-            #save()
+            try:
+                terminal('Save successful')
+                save(player)
+            except:
+                terminal('An error has occured trying to save')
+
             valid = True
         elif p_input == 'E':
             terminal('Thank you for playing!')
             sys.exit()
         else:
             print('Invalid input try again please')
-def map():
-    map_layout = [
-        [' ', 'trap', 'chest', 'monster', 'NPC'], 
-        ['BOSS', 'trap', ' ', 'trap', ' '], 
-        ['BOSS', 'NPC', ' ', 'monster', ' '], 
-        ['trap', 'monster', ' ', 'NPC ', ' '], 
-        ['monster', ' ', 'monster', 'chest', 'BOSS']]
-    
-    return map_layout # Starting position of player is (0, 0)
 def check_inventory(player):
     print(f'INVENTORY: {player['inventory']}')
     valid = False
@@ -91,24 +96,30 @@ def check_inventory(player):
                             print(f'{player['inventory'][d_input - 1]} has been removed')
                             if player['inventory'][d_input - 1] =='Iron sword':
                                 player['attack'] -= 5
+
                             elif player['inventory'][d_input - 1] == 'Cursed blade':
                                 player['attack'] -= 15
                                 player['max_health'] += 10
+                                player['karma'] += 5
                             elif player['inventory'][d_input - 1] == 'Paladin sword':
-                                terminal('This item improves attack by 25')
                                 player['attack'] -= 25
+
                             elif player['inventory'][d_input - 1] == 'Giants armour':
-                                terminal('This item improves health by 20, permamently')
                                 player['max_health'] -= 30
                                 if player['health'] > player['max_health']:
                                     player['health'] = player['max_health']
+
                             elif player['inventory'][d_input - 1] == 'dryads cloak':
-                                terminal('This item improves health by 30 but lowers attack by 10')
                                 player['attack'] += 10
                                 player['max_health'] -= 30
+
                                 if player['health'] > player['max_health']:
                                     player['health'] = player['max_health']
+
                             player['inventory'].pop(d_input - 1)
+                            if player['inventory'] == '' or ' ' in player['inventory']:
+                                if len(player['inventory']) <= 1:
+                                    player['inventory'] == []
                             print(f'INVENTORY: {player['inventory']}')
                             valid_input = True
                         else:
@@ -138,29 +149,36 @@ def Movement_option(player):
         print('3. Move East')
     if p_position[1] > 0:
         print('4. Move West')
-    try:
-        m_input = int(input('Enter the number corresponding to your desired direction: OR  5 to access menu: '))
-        if m_input == 1 and p_position[0] > 0:
-            p_position[0] -= 1
-        elif m_input == 2 and p_position[0] < 4:
-            p_position[0] += 1
-        elif m_input == 3 and p_position[1] < 4:
-            p_position[1] += 1
-        elif m_input == 4 and p_position[1] > 0:
-            p_position[1] -= 1
-        elif m_input == 5:
-            menu(player)
-        else:
-            print("⚠️⚠️You cannot move in that direction, try again⚠️⚠️")
-    except ValueError:
-        print("⚠️⚠️That is not a valid direction, try again⚠️⚠️")
+    valid = False
+    while not valid:
+        try:
+            m_input = int(input('Enter the number corresponding to your desired direction: OR  5 to access menu: '))
+            if m_input == 1 and p_position[0] > 0:
+                p_position[0] -= 1
+                valid = True
+            elif m_input == 2 and p_position[0] < 4:
+                p_position[0] += 1
+                valid = True
+            elif m_input == 3 and p_position[1] < 4:
+                p_position[1] += 1
+                valid = True
+            elif m_input == 4 and p_position[1] > 0:
+                p_position[1] -= 1
+                valid = True
+            elif m_input == 5:
+                valid = True
+                menu(player)
+            else:
+                print("⚠️⚠️You cannot move in that direction, try again⚠️⚠️")
+        except ValueError:
+            print("⚠️⚠️That is not a valid direction, try again⚠️⚠️")
     player['position'] = p_position
 def event_active(tile):
-    if tile =='monster' or tile == 'trap' or tile =='NPC' or tile == 'chest' or tile == 'BOSS':
+    if tile == 'monster' or tile == 'trap' or tile =='NPC' or tile == 'chest' or tile == 'BOSS':
         return True
     else:
         return False
-def event(player, tile, map_layout):
+def event(player, tile):
     if tile == 'monster':
         combat(player)
     elif tile == 'NPC':
@@ -171,15 +189,17 @@ def event(player, tile, map_layout):
         terminal('A nasty dungeon trap crashes into you')
         terminal('You take 10 damage from the trap')
         player['health'] -= 10  
+        if player['health'] < 0:
+            player['health'] = 0
     elif tile == 'BOSS':
-        player['clear'] == True
+        player['clear'] = not player['clear']
         combat(player)
-    map_layout[player['position'][0]][player['position'][1]] = ' ' #reset the tile so its blank
+    player['map_layout'][player['position'][0]][player['position'][1]] = 'empty' #reset the tile so its blank
     return terminal('The event has passed')
 
 def NPC(player):
     encounters = ['Priest', 'Priest', 'Beggar', 'Beggar', 'Beggar', 'Cultist', 'Cultist','Legion commander']
-    encounter = encounters[7]
+    encounter = encounters[random.randint(0, 7)]
     if encounter == 'Priest':
         priest_event(player)
     elif encounter == 'Beggar':
@@ -298,7 +318,7 @@ def legion_commander(player):
             player['karma'] += 10
             terminal('Take this aswell, you will need it')
             terminal('He hands you 3 health potions')
-            player['healthpotion'] += 1
+            player['healthpotion'] += 3
             valid = True
         elif p_input =='n' or p_input =='no':
             terminal('The paladin walks away')
@@ -313,11 +333,14 @@ def chest(player):
     RNG_item = items[random.randint(0, 11)]
     term = f'You have received a {RNG_item}!'
     terminal(term)
+    duplicate = False
     tally = 0
     for i in player['inventory']: #check if duplicates exists
         if RNG_item == i:
             tally += 1
-    if tally == 0:
+    if tally >= 1:
+        duplicate = True
+    if duplicate is False:
         if RNG_item =='Iron sword':
             terminal('This item improves your attack by 5')
             player['attack'] += 5
@@ -325,6 +348,7 @@ def chest(player):
             terminal('This item improves attack by 15 but lowers HP by 10')
             player['attack'] += 15
             player['max_health'] -= 10
+            player['karma'] -= 5
             if player['health'] > player['max_health']:
                 player['health'] = player['max_health']
         elif RNG_item == 'Paladin sword':
@@ -356,7 +380,6 @@ def debug_inventory(player):
     for i in player['inventory']:
         if inventory_dict[i] > 1:
             player['inventory'].remove(i)
-    print(player['inventory'])
             
 
 
@@ -365,16 +388,16 @@ def debug_inventory(player):
 def combat(player):
     e_enemies = ['goblin', 'Silver wolf', 'Troll', 'golem'] #Easy enemies
     h_enemies = ['Wyvern', 'Centaur', 'Hydra', 'Phoenix']
-    monster = {'health': '', 'damage': ''}
-    if player['clear'] == True:
+    monster = {'health': 0, 'damage': 0}
+    if player['clear'] is True:
         terminal('A red scaled dragon looms over you, blocking the dungeon exit')
         terminal('A voice cackles in the distance')
         terminal('Foolish humans')
         terminal('Youve never heard this voice before yet you know this is the god of darkness')
         terminal('SLAY THE DRAGON')
         terminal('STOP THE GOD OF DARKNESSES ADVANCE')
-        monster['damage'] == 30
-        monster['health'] == 500
+        monster['damage'] = 30
+        monster['health'] = 500
         encounter = 'dragon'
         d = f'Combat has initiated'
         terminal(d)
@@ -448,6 +471,7 @@ def combat(player):
                 terminal('The goddess of light has not yet abandoned this realm')
                 terminal('The righteous ending')
                 terminal('Thank you for playing survive the dungeon!')
+                sys.exit()
             elif player['karma'] <= -15:
                 terminal('Barren, dry fields of cracked earth lay the wasteland')
                 terminal('You walk through the barren desert, corruption seeps into the soil')
@@ -457,6 +481,7 @@ def combat(player):
                 terminal('A voice laughs in your ear as your consciousness fades')
                 terminal('The demonic ending')
                 terminal('Thank you for playing survive the dungeon!')
+                sys.exit()
             elif player['karma'] < 15 and player['karma'] > -15:
                 terminal('The land is torn apart, signs of warfare can be seen throughout the forest')
                 terminal('You hear the sounds of clashing, biting, slashing, spells and swords in the distance')
@@ -466,20 +491,21 @@ def combat(player):
                 terminal('Just to survive')
                 terminal('The hopeless ending')
                 terminal('Thank you for playing survive the dungeon!')
-    elif player['attack'] < 20: #Should only draw from easy enemies until player has progressed enough to fight harder enemies
+                sys.exit()
+    elif player['attack'] < 35: #Should only draw from easy enemies until player has progressed enough to fight harder enemies
         encounter = e_enemies[random.randint(0, 3)]
         if encounter == 'goblin':
                 monster['damage'] = 5
-                monster['health'] = 15
+                monster['health'] = 20
         elif encounter == 'Silver wolf':
                 monster['damage'] = 7
-                monster['health'] = 20
+                monster['health'] = 35
         elif encounter == 'Troll':
                 monster['damage'] = 10
-                monster['health'] = 20
+                monster['health'] = 45
         elif encounter == 'golem':
             monster['damage'] = 6
-            monster['health'] = 30
+            monster['health'] = 60
         d = f'Combat has initiated'
         terminal(d)
         valid_input = False
@@ -526,6 +552,8 @@ def combat(player):
                 time.sleep(1.5) # AI
                 print(f'{encounter} fights back and has dealt {monster['damage']} damage to {player['name']}')
                 player['health'] -= monster['damage']
+                if player['health'] < 0:
+                    player['health'] = 0
             elif combat_option == 2:
                 if player['healthpotion'] >= 1:
                     terminal('You have use a health potion and restored +30 HP')
@@ -558,7 +586,7 @@ def combat(player):
                 terminal('The opponent has dropped something!!')
                 terminal('rolling..........')
                 chest(player)
-    elif player['attack'] > 35:
+    elif player['attack'] >= 35:
         h_enemies = ['Wyvern', 'Centaur', 'Hydra', 'Phoenix']
         encounter = h_enemies[random.randint(0, 3)]
         if encounter == 'Wyvern':
@@ -658,24 +686,137 @@ def combat(player):
 
 
 def game(player):
-    map_layout= map()
+    map = player['map_layout']
     while player['clear'] != True and player['health'] > 0: # Exit condition player finish game to escape the dungeon or if health reaches 0 game ends
         Movement_option(player)
         print(f'Your current position is: {player["position"]}')
-        current_tile = map_layout[player['position'][0]][player['position'][1]]
-        if current_tile == ' ':
+        current_tile = map[player['position'][0]][player['position'][1]]
+        if current_tile == 'empty':
             terminal('Darkness is all you see')
         if event_active(current_tile):
             print(f'You have encountered a {current_tile}!')
-            event(player, current_tile, map_layout)
+            event(player, current_tile)
+    if player['health'] <= 0:
+        print('You have died, head back to menu and load game again to continue')
+def no_save():########
+    try:
+        with open(SAVE_FILE, "r") as file:
+            content = file.read() #ai but this is just to see if an error occurs when reading it
+            print("save file opened successfully.")
+            return False
+    except:
+        terminal('There is no save')
+        return True
+def load_save():
+    if no_save():
+        terminal("The file does not exist, starting new game")
+        return introduction()
+    else:
+        print('There is a save')
+        player = {'name': None, 'health': None, 'position': None, 'attack': None, 'healthpotion': None, 'inventory': None, 'max_health': None, 'karma': None, 'clear': None, 'map_layout': None}
+        with open(SAVE_FILE, 'r') as save_file:
+            tally = 1 # represents each line in the file
+            for line in save_file:
+                clean = line.strip()
+                splitted = clean.split(':')
+                value = splitted[1].strip()
+                if tally == 1:
+                    player['name'] = value
+                elif tally == 2:
+                    try:
+                        health = int(value)
+                        player['health'] = health
+                    except:
+                        print('A major error has occured in loading the save')
+                elif tally == 3:
+                    remove_brack = value.strip('[').strip(']')
+                    remove_comma = remove_brack.split(', ')
 
+                    position = [int(remove_comma[0]), int(remove_comma[1])]
+                    player['position'] = position
+                elif tally == 4:
+                    try:
+                        attack = int(value)
+                        player['attack'] = attack
+                    except:
+                        print('A major error has occured in loading the save')
+                elif tally == 5:
+                    try:
+                        healthpotion = int(value)
+                        player['healthpotion'] = healthpotion
+                    except:
+                        print('A major error has occured in loading the save')
+                elif tally == 6:
+                    remove_brack = value.strip("[]'").replace("'", "") #ai
+                    remove_comma = remove_brack.split(', ')
+                    inventory = []
+                    if len(remove_comma) > 1:
+                        for item in remove_comma:
+                            inventory.append(item)
+                    else:
+                        inventory = []
+                    player['inventory'] = inventory
+                elif tally == 7:
+                    try:
+                        max_health = int(value)
+                        player['max_health'] = max_health
+                    except:
+                        print('A major error has occured in loading the save')
+                elif tally == 8:
+                    try:
+                        karma = int(value)
+                        player['karma'] = karma
+                    except:
+                        print('A major error has occured in loading the save')
+                elif tally == 9:
+                    player['clear'] = False #defaults to false becasuse if you cleared the game your saves gone
+
+                elif tally == 10: #load the multidimnensional array/map
+                    map = value.strip().strip("[]'").replace("'", "")
+                    map_list = map.split("],")
+                    list = []
+                    clean_map = []
+                    for i in map_list:
+                        cleaned = i.replace("[", "").strip("")
+                        list.append(cleaned.strip())
+                    for rows in list:
+                        row = rows.split(", ")
+                        #print(row)
+                        clean_map.append(row)
+                    player['map_layout'] = clean_map
+
+                tally += 1
+            return player
+        #laod content
+def save(player):
+    with open(SAVE_FILE, 'w') as save_file:
+        for i in player:
+            save_file.write(f'{i}: {player[i]}\n')
+def main_menu():    
+    valid = False
+    while not valid:
+        print('\n')
+        print('MENU')
+        print('Type N to start a new game')
+        print('Type L to load a previous save')
+        print('Type E to exit game') 
+        p_input = input('Type the correspondent key: ').upper()
+        if p_input == 'N':
+            valid = True
+            return introduction()
+        elif p_input == 'L':
+            valid = True
+            return load_save()
+        elif p_input == 'E':
+            valid = True
+            terminal('Thank you for playing!')
+            sys.exit()
+        else:
+            print('Invalid input try again please')
+        
 def main():
-    #if new_game(): check if a save file exists already if not create a new game
-    player = introduction()
-    #Gameplay loop, as long as exit conditions not met (Either player dies, escapes or quits), the game continues to run.
-    #while exit condtion not met run game):
+    player = main_menu()
     game(player)
-    #while exit(health, escaped, quit) == False:
     return None
 
 main()
