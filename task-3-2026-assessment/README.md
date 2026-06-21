@@ -1,6 +1,13 @@
 # task-3-2026-assessment
 How to play the game:
 Edburt: if ur reading this read this file and lmk if there is any thing ur confused aboutthat isnt explained in here
+
+INSTALLATION INSTRUCTIONS:
+
+1. Download main.py and ensure that python is installed onto your computer
+2. Either go to file explorer and find main.py then open it or open file in VS code and run it using the terminal
+
+
 Intro:
 You will first be introduced with a menu upon running this program. Either start a new game or load a old one or exit. When clicking load a new game, 
 ensure that you have a save file already before clicking, if not the game will immediately send you into a new game.

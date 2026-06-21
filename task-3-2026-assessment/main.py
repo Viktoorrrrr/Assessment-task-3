@@ -10,8 +10,11 @@ def introduction():
                       'There is only one way out.', 'SURVIVE.']
     terminal('What is your name, young adventurer? ')
     name = input('').strip()
-    while name == "" or name.isspace():
+    while name == "" or name.isspace() or len(name) > 15:
+        if len(name) > 15:
+            terminal('Name cannot be greater then 15 characters')
         name = input('Please enter a valid name: ')
+
     for line in story_dialogue: # loop through list containing story stuff and display it
         terminal(line)
         p_input = input(f'Enter a key to continue...(or type "skip" to skip): ').strip()
@@ -643,7 +646,7 @@ def combat(player):
             if combat_option == 1:
                 monster['health'] -= round(player['attack'] * damage_bonus)
                 print(f'{player['name']} has dealt {round(player['attack'] * damage_bonus, 2)} to {encounter}')
-                time.sleep(1.5) # AI
+                time.sleep(1.5)
                 print(f'{encounter} fights back and has dealt {round(monster['damage'], 2)} damage to {player['name']}')
                 player['health'] -= round(monster['damage'], 2)
             elif combat_option == 2:
