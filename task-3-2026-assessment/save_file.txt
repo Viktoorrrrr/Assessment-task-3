@@ -1,0 +1,10 @@
+name: vc
+health: 80
+position: [2, 1]
+attack: 10
+healthpotion: 6
+inventory: ['dryads cloak']
+max_health: 130
+karma: 0
+clear: False
+map_layout: [['empty', 'empty', 'monster', 'trap', 'empty'], ['chest', 'empty', 'empty', 'monster', 'NPC'], ['trap', 'empty', 'chest', 'NPC', 'monster'], ['monster', 'empty', 'monster', 'chest', 'monster'], ['chest', 'empty', 'trap', 'chest', 'BOSS']]
