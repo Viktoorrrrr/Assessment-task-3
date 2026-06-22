@@ -7,6 +7,8 @@ INSTALLATION INSTRUCTIONS:
 1. Download main.py and ensure that python is installed onto your computer
 2. Either go to file explorer and find main.py then open it or open file in VS code and run it using the terminal
 
+MINIMUM SYSTEM REQUIREMENTS:
+
 
 Intro:
 You will first be introduced with a menu upon running this program. Either start a new game or load a old one or exit. When clicking load a new game, 
