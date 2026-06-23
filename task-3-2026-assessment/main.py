@@ -44,6 +44,7 @@ def menu(player):
     print('Type I for inventory access') #options
     print('Type H to use a health potion')
     print('Type P to view player stats')
+    print('Type M to exit menu')
     print('Type S to save game')     
     print('Type E to exit game (please save first!!)')       
     valid = False
@@ -66,6 +67,9 @@ def menu(player):
             print(f'Health: {player['health']}/{player['max_health']} Attack: {player['attack']} Potions: {player['healthpotion']}')
             time.sleep(1)
             valid = True 
+        elif p_input == 'M':
+            valid = True
+                
         elif p_input == 'S':
             try:
                 terminal('Save successful')
