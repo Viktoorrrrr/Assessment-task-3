@@ -399,7 +399,7 @@ def combat(player):
         terminal('SLAY THE DRAGON')
         terminal('STOP THE GOD OF DARKNESSES ADVANCE')
         monster['damage'] = 30
-        monster['health'] = 500
+        monster['health'] = 300
         encounter = 'dragon'
         d = f'Combat has initiated'
         terminal(d)
