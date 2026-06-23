@@ -7,12 +7,10 @@ INSTALLATION INSTRUCTIONS:
 1. Download main.py and ensure that python is installed onto your computer
 2. Either go to file explorer and find main.py then open it or open file in VS code and run it using the terminal
 
-MINIMUM SYSTEM REQUIREMENTS:
 
 
 Intro:
-You will first be introduced with a menu upon running this program. Either start a new game or load a old one or exit. When clicking load a new game, 
-ensure that you have a save file already before clicking, if not the game will immediately send you into a new game.
+You will first be introduced with a menu upon running this program. Either start a new game or load a old one or exit. When clicking load a new game, ensure that you have a save file already before clicking, if not the game will immediately send you into a new game.
 
 Main goal:
 Goal of the user is to not die and escape the dungeon, navigating the dungeon to collect items, improve their stats, defeat monsters and survive. To clear the game the user must kill the boss monster
@@ -28,8 +26,7 @@ You can either choose to save, inspect inventory, view stats or leave the game
 Choosing iventory, as long as the player has items in it they can choose to remove items in it. Also duplicates are not allowed so picking up new items will first check if it already exists in the players inventory and the player will not receive said item. Only exception is health potions
 
 Combat:
-Upon combat, players will be asked whether they wish to roll a die. If they do roll it the die rolls a numebr between 1-20
-any number higher then 10 is a damage bonus whilst lower is a debuff. the math works as number/10 times by damage e.g. if roll 15 you get a 1.5x damage multiplier
+Upon combat, players will be asked whether they wish to roll a die. If they do roll it the die rolls a number between 1-20 any number higher then 10 is a damage bonus whilst lower is a debuff. the math works as number/10 times by damage e.g. if roll 15 you get a 1.5x damage multiplier
 This is a RNG based combat system so players can either choose to take the risk if they believe they stand little chance against monsters or ignore it and continue with combat with a 1x damage multiploer
 
 In combat players can choose to either attack, use a health potion or escape

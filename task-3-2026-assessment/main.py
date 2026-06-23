@@ -105,6 +105,7 @@ def check_inventory(player):
                                 player['karma'] += 5
                             elif player['inventory'][d_input - 1] == 'Paladin sword':
                                 player['attack'] -= 25
+                                player['karma'] -= 5
 
                             elif player['inventory'][d_input - 1] == 'giants armour':
                                 player['max_health'] -= 30
@@ -356,6 +357,7 @@ def chest(player):
         elif RNG_item == 'Paladin sword':
             terminal('This item improves attack by 25')
             player['attack'] += 25
+            player['karma'] += 5
         elif RNG_item == 'health potion':
             terminal('This item improves health by 30 when used in combat ')
             player['healthpotion'] += 1
@@ -384,9 +386,6 @@ def debug_inventory(player):
         if inventory_dict[i] > 1:
             player['inventory'].remove(i) #remove said items if more than 1 exists
             
-
-
-
 
 def combat(player):
     e_enemies = ['goblin', 'Silver wolf', 'Troll', 'golem'] #Easy enemies
