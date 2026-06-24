@@ -33,6 +33,36 @@ def introduction():
         for i in player:
             save_file.write(f'{i}: {player[i]}\n')
     return player
+def ending(player):
+    terminal('The dragon has been slain')
+    terminal('You open the large stone doors and witness the outside world') #end game credits, change ending based on karma
+    if player['karma'] >= 15:
+        terminal('Rich landscapes and bustling cities can be seen in the distance')
+        terminal('You walk through the forest, lush greenery and animals are seen everywhere')
+        terminal('The goddess of light has not yet abandoned this realm')
+        terminal('The righteous ending')
+        terminal('Thank you for playing survive the dungeon!')
+        sys.exit()
+    elif player['karma'] <= -15:
+        terminal('Barren, dry fields of cracked earth lay the wasteland')
+        terminal('You walk through the barren desert, corruption seeps into the soil')
+        terminal('Poverty, famine and demons infect this world')
+        terminal('You grow tired and collapse under the brutal sun')
+        terminal('The goddess of light has  abandoned this realm')
+        terminal('A voice laughs in your ear as your consciousness fades')
+        terminal('The demonic ending')
+        terminal('Thank you for playing survive the dungeon!')
+        sys.exit()
+    elif player['karma'] < 15 and player['karma'] > -15:
+        terminal('The land is torn apart, signs of warfare can be seen throughout the forest')
+        terminal('You hear the sounds of clashing, biting, slashing, spells and swords in the distance')
+        terminal('Legions of monsters are being desperately held off by the paladins')
+        terminal('The god of darknesses invasion continues onto this realm')
+        terminal('You continue to fight, not to protect')
+        terminal('Just to survive')
+        terminal('The hopeless ending')
+        terminal('Thank you for playing survive the dungeon!')
+        sys.exit()
 def terminal(text, speed=0.05): # function was entirely AI
     for char in text:
         sys.stdout.write(char)
@@ -126,7 +156,7 @@ def check_inventory(player):
                             player['inventory'].pop(d_input - 1)
                             if player['inventory'] == '' or ' ' in player['inventory']:
                                 if len(player['inventory']) <= 1:
-                                    player['inventory'] == []
+                                    player['inventory'] = []
                             print(f'INVENTORY: {player['inventory']}')
                             valid_input = True
                         else:
@@ -366,7 +396,7 @@ def chest(player):
             terminal('This item improves health by 30 when used in combat ')
             player['healthpotion'] += 1
         elif RNG_item == 'giants armour':
-            terminal('This item improves health by 20, permamently')
+            terminal('This item improves health by 3peer review0, permamently')
             player['max_health'] += 30
         elif RNG_item == 'dryads cloak':
             terminal('This item improves health by 30 but lowers attack by 10')
@@ -389,8 +419,31 @@ def debug_inventory(player):
     for i in player['inventory']:
         if inventory_dict[i] > 1:
             player['inventory'].remove(i) #remove said items if more than 1 exists
-            
-
+def die_roll(player):            
+    valid_input = False
+    while not valid_input:
+        if player['max_health'] != 100:
+            if player['health'] > player['max_health']:
+                player['health'] = player['max_health']
+        try:
+            p_input = int(input('Would you like to roll the die? (1 for yes, 2 for no) '))
+            if p_input == 1:
+                terminal('Rolling the die of fate...') #Roll a die 1-20 like dnd and if 11-20 multiply damage but less than is a debuff
+                damage_bonus = random.randint(1, 20)
+                dialogue = f'You rolled a {damage_bonus}'
+                terminal(dialogue)
+                if damage_bonus > 10:
+                    terminal('The goddess of light has blessed your fight')
+                elif damage_bonus < 10:
+                    terminal('The god of darkness curses your fight')
+                damage_bonus = damage_bonus / 10
+                valid_input = True
+            elif p_input == 2: 
+                damage_bonus = 1
+                valid_input = True
+        except ValueError:
+            print('Wrong input try again')
+        return damage_bonus
 def combat(player):
     e_enemies = ['goblin', 'Silver wolf', 'Troll', 'golem'] #Easy enemies
     h_enemies = ['Wyvern', 'Centaur', 'Hydra', 'Phoenix']
@@ -407,29 +460,7 @@ def combat(player):
         encounter = 'dragon'
         d = f'Combat has initiated'
         terminal(d)
-        valid_input = False
-        while not valid_input:
-            if player['max_health'] != 100:
-                if player['health'] > player['max_health']:
-                    player['health'] = player['max_health']
-            try:
-                p_input = int(input('Would you like to roll the die? (1 for yes, 2 for no) '))
-                if p_input == 1:
-                    terminal('Rolling the die of fate...') #Roll a die 1-20 like dnd and if 11-20 multiply damage but less than is a debuff
-                    damage_bonus = random.randint(1, 20)
-                    dialogue = f'You rolled a {damage_bonus}'
-                    terminal(dialogue)
-                    if damage_bonus > 10:
-                        terminal('The goddess of light has blessed your fight')
-                    elif damage_bonus < 10:
-                        terminal('The god of darkness curses your fight')
-                    damage_bonus = damage_bonus / 10
-                    valid_input = True
-                elif p_input == 2: 
-                    damage_bonus = 1
-                    valid_input = True
-            except ValueError:
-                print('Wrong input try again')
+        damage_bonus = die_roll(player)
         terminal('The dragon approaches you what do you do')
         while player['health'] > 0 and monster['health'] > 0:
             valid_input = False
@@ -468,35 +499,7 @@ def combat(player):
             terminal(a)
             sys.exit()
         elif monster['health'] <= 0 and player['health'] > 0:
-            terminal('The dragon has been slain')
-            terminal('You open the large stone doors and witness the outside world') #end game credits, change ending based on karma
-            if player['karma'] >= 15:
-                terminal('Rich landscapes and bustling cities can be seen in the distance')
-                terminal('You walk through the forest, lush greenery and animals are seen everywhere')
-                terminal('The goddess of light has not yet abandoned this realm')
-                terminal('The righteous ending')
-                terminal('Thank you for playing survive the dungeon!')
-                sys.exit()
-            elif player['karma'] <= -15:
-                terminal('Barren, dry fields of cracked earth lay the wasteland')
-                terminal('You walk through the barren desert, corruption seeps into the soil')
-                terminal('Poverty, famine and demons infect this world')
-                terminal('You grow tired and collapse under the brutal sun')
-                terminal('The goddess of light has  abandoned this realm')
-                terminal('A voice laughs in your ear as your consciousness fades')
-                terminal('The demonic ending')
-                terminal('Thank you for playing survive the dungeon!')
-                sys.exit()
-            elif player['karma'] < 15 and player['karma'] > -15:
-                terminal('The land is torn apart, signs of warfare can be seen throughout the forest')
-                terminal('You hear the sounds of clashing, biting, slashing, spells and swords in the distance')
-                terminal('Legions of monsters are being desperately held off by the paladins')
-                terminal('The god of darknesses invasion continues onto this realm')
-                terminal('You continue to fight, not to protect')
-                terminal('Just to survive')
-                terminal('The hopeless ending')
-                terminal('Thank you for playing survive the dungeon!')
-                sys.exit()
+            ending(player)
     elif player['attack'] < 35: #Should only draw from easy enemies until player has progressed enough to fight harder enemies
         encounter = e_enemies[random.randint(0, 3)]
         if encounter == 'goblin':
@@ -514,25 +517,7 @@ def combat(player):
         d = f'Combat has initiated'
         terminal(d)
         valid_input = False
-        while not valid_input:
-            try:
-                p_input = int(input('Would you like to roll the die? (1 for yes, 2 for no) '))
-                if p_input == 1:
-                    terminal('Rolling the die of fate...') #Roll a die 1-20 like dnd and if 11-20 multiply damage but less than is a debuff
-                    damage_bonus = random.randint(1, 20)
-                    dialogue = f'You rolled a {damage_bonus}'
-                    terminal(dialogue)
-                    if damage_bonus > 10:
-                        terminal('The goddess of light has blessed your fight')
-                    elif damage_bonus < 10:
-                        terminal('The god of darkness curses your fight')
-                    damage_bonus = damage_bonus / 10
-                    valid_input = True
-                elif p_input == 2: 
-                    damage_bonus = 1
-                    valid_input = True
-            except ValueError:
-                print('Wrong input try again')
+        damage_bonus = die_roll(player)
         a = f'A wild {encounter} has attacked you what will you do?'
         terminal(a)
         while player['health'] > 0 and monster['health'] > 0:
@@ -608,29 +593,7 @@ def combat(player):
             monster['health'] = 35
         d = f'Combat has initiated'
         terminal(d)
-        valid_input = False
-        while not valid_input:
-            if player['max_health'] != 100:
-                if player['health'] > player['max_health']:
-                    player['health'] = player['max_health']
-            try:
-                p_input = int(input('Would you like to roll the die? (1 for yes, 2 for no) '))
-                if p_input == 1:
-                    terminal('Rolling the die of fate...') #Roll a die 1-20 like dnd and if 11-20 multiply damage but less than is a debuff
-                    damage_bonus = random.randint(1, 20)
-                    dialogue = f'You rolled a {damage_bonus}'
-                    terminal(dialogue)
-                    if damage_bonus > 10:
-                        terminal('The goddess of light has blessed your fight')
-                    elif damage_bonus < 10:
-                        terminal('The god of darkness curses your fight')
-                    damage_bonus = damage_bonus / 10
-                    valid_input = True
-                elif p_input == 2: 
-                    damage_bonus = 1
-                    valid_input = True
-            except ValueError:
-                print('Wrong input try again')
+        damage_bonus = die_roll(player)
         a = f'A wild {encounter} has attacked you what will you do?'
         terminal(a)
         while player['health'] > 0 and monster['health'] > 0:
@@ -694,7 +657,6 @@ def game(player):
     map = player['map_layout']
     while player['clear'] != True and player['health'] > 0: # Exit condition player finish game to escape the dungeon or if health reaches 0 game ends
         Movement_option(player)
-        print(f'Your current position is: {player["position"]}')
         current_tile = map[player['position'][0]][player['position'][1]]
         if current_tile == 'empty':
             terminal('Darkness is all you see')
